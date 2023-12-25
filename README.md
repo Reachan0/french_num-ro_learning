@@ -1,4 +1,4 @@
-# french_num-ro_learning
+# french_numéro_learning
 generate french number from 0 to 70 sole, and also in sentences (with gpt).
 
 # How to use
