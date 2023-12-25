@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Listening Test</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+        }
+
+        .menu-bar {
+            display: flex;
+            justify-content: center;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 10px 0;
+        }
+
+        .menu-item {
+            padding: 10px 15px;
+            margin: 0 10px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-weight: bold;
+            color: #555;
+            border-bottom: 3px solid transparent;
+            transition: color 0.3s, border-color 0.3s;
+        }
+
+        .menu-item:hover,
+        .menu-item.active {
+            color: #2c3e50;
+            border-bottom-color: #2c3e50;
+        }
+
+        .content-section {
+            display: none;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        #generate-btn, #submit-btn, #show-sentence-answer-btn, #show-answer-btn, #generate-sentence-btn1, #generate-sentence-btn, #sentence-submit-btn {
+            padding: 10px 20px;
+            margin-top: 15px;
+            border: none;
+            background-color: #2c3e50;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #generate-btn:hover, #submit-btn:hover, #generate-sentence-btn:hover, #show-sentence-answer-btn:hover, #show-answer-btn:hover, #generate-sentence-btn:hover, #sentence-submit-btn:hover {
+            background-color: #34495e;
+        }
+
+        #guess-input, #sentence-guess-input {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            width: 80%;
+            max-width: 400px;
+            margin-top: 15px;
+        }
+
+        #result, #sentence-result {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #27ae60;
+        }
+
+        h1 {
+            color: #2c3e50;
+        }
+
+        h2 {
+            color: #34495e;
+            margin: 20px 0;
+        }
+
+        audio {
+            margin-top: 15px;
+        }
+
+        #prev-sentence-btn {
+            background-color: rgba(0, 0, 0, 0); /* Button background color */
+            height: 50px;
+            width: 50px;
+            border: none;
+            padding: 10px; /* Button padding */
+            cursor: pointer;
+            border-radius: 5px; /* Rounded corners for the button */
+            outline: none;
+            /* SVG background */
+            background-image: url('data:image/svg+xml;utf8,<svg t="1703046978072" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1491" width="32" height="32"><path d="M919.841244 513.334391c0-225.25016-182.591595-407.841755-407.842779-407.841755-225.25016 0-407.841755 182.592618-407.841755 407.841755 0 225.251184 182.591595 407.841755 407.841755 407.841755 92.471065 0 177.138396-31.458479 245.553579-83.303264 2.809999-3.187599 4.65502-7.257288 4.65502-11.828396 0-9.985422-8.093329-18.079774-18.077727-18.079774-5.180999 0-9.794064 2.054799-13.087063 5.536087l-0.232291 0c-61.217247 45.049009-136.576585 72.021314-218.412428 72.021314-203.961298 0-369.335766-165.393911-369.335766-369.334743 0-203.983811 165.373445-369.335766 369.335766-369.335766 203.984834 0 369.335766 165.351955 369.335766 369.335766 0 62.289672-14.617929 120.931257-41.881876 172.440397l0 0.293689c-0.503467 1.719154-1.049912 3.39533-1.049912 5.242398 0 9.983375 8.096399 18.079774 18.080797 18.079774 7.780197 0 14.281261-4.990664 16.820084-11.872399l0 0.125867C902.74896 644.373867 919.841244 580.866461 919.841244 513.334391zM681.294243 433.509345 522.738064 594.165348 367.955838 437.305811c-9.647731-9.709129-24.287149-10.654664-32.718169-2.201132-8.43102 8.472975-7.467065 23.195282 2.181689 32.906457l166.105109 168.225399c5.497201 5.494131 12.627598 8.094352 19.294438 7.842619 6.627954 0.209778 13.675464-2.367931 19.169595-7.884574L711.830723 464.23616c9.647731-9.709129 10.613732-24.411993 2.180666-32.906457C705.581392 422.856727 690.942997 423.821705 681.294243 433.509345z" fill="%231296db" p-id="1492"></path></svg>');
+            background-repeat: no-repeat;
+            background-position: center; /* Center the SVG icon */
+            rotate: 90deg;
+        }
+
+        #next-sentence-btn {
+            background-color: rgba(0, 0, 0, 0); /* Button background color */
+            height: 50px;
+            width: 50px;
+            border: none;
+            padding: 10px; /* Button padding */
+            cursor: pointer;
+            border-radius: 5px; /* Rounded corners for the button */
+            outline: none;
+            /* SVG background */
+            background-image: url('data:image/svg+xml;utf8,<svg t="1703046978072" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1491" width="32" height="32"><path d="M919.841244 513.334391c0-225.25016-182.591595-407.841755-407.842779-407.841755-225.25016 0-407.841755 182.592618-407.841755 407.841755 0 225.251184 182.591595 407.841755 407.841755 407.841755 92.471065 0 177.138396-31.458479 245.553579-83.303264 2.809999-3.187599 4.65502-7.257288 4.65502-11.828396 0-9.985422-8.093329-18.079774-18.077727-18.079774-5.180999 0-9.794064 2.054799-13.087063 5.536087l-0.232291 0c-61.217247 45.049009-136.576585 72.021314-218.412428 72.021314-203.961298 0-369.335766-165.393911-369.335766-369.334743 0-203.983811 165.373445-369.335766 369.335766-369.335766 203.984834 0 369.335766 165.351955 369.335766 369.335766 0 62.289672-14.617929 120.931257-41.881876 172.440397l0 0.293689c-0.503467 1.719154-1.049912 3.39533-1.049912 5.242398 0 9.983375 8.096399 18.079774 18.080797 18.079774 7.780197 0 14.281261-4.990664 16.820084-11.872399l0 0.125867C902.74896 644.373867 919.841244 580.866461 919.841244 513.334391zM681.294243 433.509345 522.738064 594.165348 367.955838 437.305811c-9.647731-9.709129-24.287149-10.654664-32.718169-2.201132-8.43102 8.472975-7.467065 23.195282 2.181689 32.906457l166.105109 168.225399c5.497201 5.494131 12.627598 8.094352 19.294438 7.842619 6.627954 0.209778 13.675464-2.367931 19.169595-7.884574L711.830723 464.23616c9.647731-9.709129 10.613732-24.411993 2.180666-32.906457C705.581392 422.856727 690.942997 423.821705 681.294243 433.509345z" fill="%231296db" p-id="1492"></path></svg>');
+            background-repeat: no-repeat;
+            background-position: center; /* Center the SVG icon */
+            rotate: -90deg;
+        }
+
+        /* 调整按钮在鼠标悬停时的样式 */
+        #prev-sentence-btn:hover, #next-sentence-btn:hover {
+            background-color: #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+<div class="menu-bar">
+    <div class="menu-item active" data-target="#number-test-section" onclick="play_number_audio()">单独数字听力测试</div>
+    <div class="menu-item" data-target="#sentence-test-section" onclick="play_sentence_audio()">句中数字听力测试</div>
+</div>
+
+<div id="number-test-section" class="content-section active">
+    <h1>数字练习</h1>
+    <div>
+        数字范围: 0 - 70
+        <!--        <span id="length-display">10</span></label><br>-->
+        <!--        <input type="range" id="length-slider" min="1" max="20" value="10" style="width: 90%;">-->
+    </div>
+    <button id="generate-btn">刷新数字</button>
+    <br>
+    <audio id="audio-player" controls></audio>
+    <br>
+    <input type="number" id="guess-input" placeholder="请输入你听到的数字" step="2"/><br>
+    <button id="submit-btn">提交</button>
+    <button id="show-answer-btn">显示答案</button>
+    <p id="result"></p>
+</div>
+
+<div id="sentence-test-section" class="content-section">
+    <h1>连诵练习</h1>
+    <div id="sentence-info">当前句子: <var></var>/20</div>
+    <button id="generate-sentence-btn1" class="button">刷新句子</button>
+    <br>
+
+    <div id="loading" class="loading">生成中...</div>
+
+    <audio id="sentence-audio-player" controls></audio>
+    <br>
+    <div id="sentence-text" class="input-field" style="height: auto;">这里显示文本内容，数字用___代替</div>
+    <br>
+    <button id="prev-sentence-btn" class="button"></button>
+    <button id="next-sentence-btn" class="button"></button>
+    <br>
+
+    <input type="number" id="sentence-guess-input" class="input-field" placeholder="输入句子中的数字" step="2"/><br>
+    <button id="sentence-submit-btn" class="button">提交</button>
+    <button id="show-sentence-answer-btn" class="button">显示答案</button>
+    <div id="sentence-result" class="result"></div>
+</div>
+
+<script>
+    var currentIndex = 0;
+    var begin = 0;
+    var begin1 = 0;
+
+    function play_number_audio(){
+        $('#sentence-audio-player').trigger('pause');
+        $('#audio-player').trigger('play');
+    }
+
+    function play_sentence_audio(){
+        $('#audio-player').trigger('pause');
+        $('#sentence-audio-player').trigger('play');
+    }
+
+    $('#generate-sentence-btn').click(function () {
+        $('#loading').show();  // 显示加载提示
+        loadSentence(currentIndex);  // 重新加载当前索引的句子
+    });
+
+    $('#generate-sentence-btn1').click(function () {
+        $('#loading').show();  // 显示加载提示
+        $.ajax({
+            url: '/get_sentences',
+            type: 'GET',
+            success: function (data) {
+                currentIndex = 0;
+                loadSentence(currentIndex);  // 重新加载当前索引的句子
+            }
+        });
+
+    });
+
+    // 加载句子的函数
+    function loadSentence(index) {
+        $.getJSON(`/generate_sentence_audio/${index}`, function (data) {
+            $('#sentence-audio-player').attr('src', `/audio/${data.audio_file}`);
+            currentIndex = index;
+            
+            if (begin != 0) {
+                $('#sentence-audio-player').trigger('play');
+            }
+            if (begin == 0) {
+                begin = 1;
+                document.getElementById('generate-btn').click();
+            }
+
+            $('#sentence-result').text('');
+            $('#sentence-guess-input').val('');
+            $('#loading').hide();  // 加载完成后隐藏加载提示
+            $('#sentence-text').text(replaceNumbersWithUnderscores(data.sentence));
+            updateSentenceInfo()
+        }).fail(function (response) {
+            $('#loading').hide();  // 出错时隐藏加载提示
+            alert('Error: ' + response.responseJSON.error);
+        });
+        // console.log(sentences[currentIndex]);
+        // $('#sentence-text').text(sentences[currentIndex]);
+    }
+	
+    function replaceNumbersWithUnderscores(sentence) {
+        // 使用正则表达式匹配数字并替换为下划线
+        return sentence.replace(/\d+/g, '___');
+    }
+
+    function updateSentenceInfo() {
+        $.getJSON('/get_sentence_info', function(data) {
+            $('#sentence-info').text('当前句子: ' + (currentIndex + 1) + '/' + data.total_sentences);
+        });
+    }
+
+    $('#show-sentence-answer-btn').click(function () {
+        // 显示当前索引句子的正确答案
+        $.getJSON(`/generate_sentence_audio/${currentIndex}`, function (data) {
+            $('#sentence-result').text(data.sentence);
+        });
+    });
+    $('#prev-sentence-btn').click(function () {
+        loadSentence((currentIndex - 1 + 20) % 20);
+    });
+
+    $('#next-sentence-btn').click(function () {
+        loadSentence((currentIndex + 1 + 20) % 20);
+    });
+
+    $('#sentence-submit-btn').click(function () {
+        var userGuess = $('#sentence-guess-input').val().trim();
+
+        // 获取句子和正确答案
+        $.getJSON(`/generate_sentence_audio/${currentIndex}`, function (data) {
+            // 从句子中提取所有的数字
+            var numbersInSentence = data.sentence.match(/\d+/g) || [];
+
+            // 将提取的数字数组转化为字符串用于匹配（考虑到可能有多个数字）
+            var numbersStr = numbersInSentence.join(" ");
+
+            // 检查用户的猜测是否与句子中的所有数字匹配
+            if (userGuess === numbersStr) {
+                $('#sentence-result').text('Correct!');
+                loadSentence((currentIndex + 1 + 20) % 20);
+            } else {
+                $('#sentence-result').text('Incorrect, try again.');
+            }
+        }).fail(function () {
+            $('#sentence-result').text('Error: Unable to get the sentence.');
+        });
+    });
+
+
+    // 加载初始句子音频
+    loadSentence(currentIndex);
+    document.getElementById('generate-btn').click();
+    $(document).ready(function () {
+        updateSentenceInfo();
+        document.getElementById('generate-btn').click();
+        $('.menu-item').click(function () {
+            // 移除所有菜单项的active类
+            $('.menu-item').removeClass('active');
+            // 给当前点击的菜单项添加active类
+            $(this).addClass('active');
+
+            // 隐藏所有内容部分
+            $('.content-section').removeClass('active').hide();
+            // 显示与点击的菜单项相关联的内容部分
+            $($(this).data('target')).addClass('active').show();
+        });
+    });
+    $(document).ready(function () {
+        var correctNumber = "";
+        $('#length-slider').on('input', function () {
+            $('#length-display').text($(this).val());
+        });
+        
+        $('#generate-btn').click(function () {
+            var length = $('#length-slider').val();
+            $.ajax({
+                url: '/generate_audio',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({length: length}),
+                success: function (data) {
+                    $('#audio-player').attr('src', data.audio_file);
+                    $('#audio-player').trigger('play');
+                    correctNumber = data.number;
+                    $('#result').text('');
+                    $('#guess-input').val('');
+                }
+            });
+        });
+        $('#submit-btn').click(function () {
+            var userGuess = $('#guess-input').val();
+            if (userGuess === correctNumber) {
+                $('#result').text('Correct!');
+                document.getElementById('generate-btn').click();
+            } else {
+                $('#result').text('Incorrect, try again.');
+            }
+        });
+        $('#show-answer-btn').click(function () {
+            $('#result').text('The correct number was: ' + correctNumber);
+        });
+    });
+    // 当文档加载完毕时执行
+    document.addEventListener('DOMContentLoaded', function() {
+        // 监听整个文档的点击事件
+        document.addEventListener('click', function(event) {
+            var inputElement1 = document.getElementById('sentence-guess-input'); // 替换为您的输入框ID
+            var inputElement2 = document.getElementById('guess-input'); // 替换为您的输入框ID
+//            var sendButton = document.getElementById('sentence-submit-btn'); // 替换为您的发送按钮ID
+
+            // 检查点击是否发生在输入框外部
+            if (!inputElement1.contains(event.target)) {
+                // 在这里执行发送按钮的点击事件
+                inputElement1.focus()
+            }
+            // 检查点击是否发生在输入框外部
+            if (!inputElement2.contains(event.target)) {
+                // 在这里执行发送按钮的点击事件
+                inputElement2.focus()
+            }
+        });
+    });
+    $("#sentence-guess-input").keydown(function(e){    
+    if( e.keyCode == 13 )      
+        document.getElementById('sentence-submit-btn').click();
+	});
+	$("#guess-input").keydown(function(e){    
+    if( e.keyCode == 13 )      
+        document.getElementById('submit-btn').click();
+	});
+	
+</script>
+</body>
+</html>
