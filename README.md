@@ -11,5 +11,4 @@ Install the packages
 
 
 Replace api_key to your own.  
-Run  
-```python app.py```
+Run ```python app.py```
